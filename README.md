@@ -9,7 +9,7 @@
 ## Usage
 
 ```
-sudo ./nsenter --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
+sudo ./nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
 [root@base /]# tty
 /dev/pts/0
 ```
@@ -17,7 +17,7 @@ sudo ./nsenter --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bas
 ### without pty
 
 ```
-sudo ./nsenter --target <NAMESPACE_IP> --mount --uts --ipc --net --pid bash
+sudo ./nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid bash
 [root@base /]# tty
 not a tty
 ```
