@@ -21,36 +21,25 @@
 #define _XOPEN_SOURCE 700
 #define _GNU_SOURCE 1
 
-#include <dirent.h>
-#include <errno.h>
-#include <getopt.h>
-#include <sched.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <termios.h>
-#include <unistd.h>
 #include <assert.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/ioctl.h>
-#include <sys/select.h>
-#include <sched.h>
-#include <term.h>
+#include <err.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <getopt.h>
 #include <grp.h>
-#include <linux/sched.h>
-#include <stdio_ext.h>
 #include <limits.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <sched.h>
+#include <signal.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <stdarg.h>
+#include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
-#include <err.h>
-#include <fcntl.h>
-#include <sys/stat.h>
+#include <stdbool.h>
+#include <sys/ioctl.h>
+#include <sys/select.h>
+#include <sys/wait.h>
+#include <termios.h>
+#include <unistd.h>
 
 #define DEFAULT_SHELL "/bin/sh"
 #define PROGRAM_VERSION "1"
