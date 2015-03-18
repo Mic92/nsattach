@@ -3,7 +3,7 @@
 ## Build
 
 ```
-gcc -std=c99 nsenter.c -o nsenter
+./autogen.sh && ./configure && make
 ```
 
 ## Usage

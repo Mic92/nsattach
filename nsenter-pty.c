@@ -19,7 +19,6 @@
  */
 
 #define _XOPEN_SOURCE 700
-#define PACKAGE_STRING "nsenter"
 #define _GNU_SOURCE 1
 
 #include <dirent.h>
