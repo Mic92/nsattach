@@ -42,7 +42,7 @@
 #include <unistd.h>
 
 #define DEFAULT_SHELL "/bin/sh"
-#define PROGRAM_VERSION "1"
+#define PROGRAM_VERSION "0.0.1"
 
 unsigned long strtoul_or_err(const char *str, const char *errmesg)
 {
@@ -69,6 +69,7 @@ void exec_shell(void)
 {
 	const char *shell = getenv("SHELL"), *shell_basename;
 	char *arg0;
+
 	if (!shell)
 		shell = DEFAULT_SHELL;
 
@@ -94,13 +95,13 @@ static struct namespace_file {
 	 * first.  This gives an unprivileged user the potential to
 	 * enter the other namespaces.
 	 */
-	{ .nstype = CLONE_NEWUSER, .name = "ns/user", .fd = -1 },
-	{ .nstype = CLONE_NEWIPC,  .name = "ns/ipc",  .fd = -1 },
-	{ .nstype = CLONE_NEWUTS,  .name = "ns/uts",  .fd = -1 },
-	{ .nstype = CLONE_NEWNET,  .name = "ns/net",  .fd = -1 },
-	{ .nstype = CLONE_NEWPID,  .name = "ns/pid",  .fd = -1 },
-	{ .nstype = CLONE_NEWNS,   .name = "ns/mnt",  .fd = -1 },
-	{ .nstype = 0, .name = NULL, .fd = -1 }
+	{ .nstype = CLONE_NEWUSER, .name   = "ns/user", .fd  = -1 },
+	{ .nstype = CLONE_NEWIPC,  .name   = "ns/ipc",	.fd  = -1 },
+	{ .nstype = CLONE_NEWUTS,  .name   = "ns/uts",	.fd  = -1 },
+	{ .nstype = CLONE_NEWNET,  .name   = "ns/net",	.fd  = -1 },
+	{ .nstype = CLONE_NEWPID,  .name   = "ns/pid",	.fd  = -1 },
+	{ .nstype = CLONE_NEWNS,   .name   = "ns/mnt",	.fd  = -1 },
+	{ .nstype = 0,		   .name   = NULL,	.fd  = -1 }
 };
 
 static void usage(int status)
@@ -194,14 +195,14 @@ static void restore_stdin(void)
 {
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &stdin_termios) == -1)
 		errx(EXIT_FAILURE,
-				"failed to restore stdin terminal attributes");
+		     "failed to restore stdin terminal attributes");
 }
 
 static void restore_stdout(void)
 {
 	if (tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_termios) == -1)
 		errx(EXIT_FAILURE,
-				"failed to restore stdout terminal attributes");
+		     "failed to restore stdout terminal attributes");
 }
 
 
@@ -219,12 +220,14 @@ static int set_tty_raw(int fd, struct termios *origin_attr)
 	return tcsetattr(fd, TCSANOW, attr);
 }
 
-static void shovel_tty(int master_fd, int in_fd) {
+static void shovel_tty(int master_fd, int in_fd)
+{
 	fd_set read_fds[1];
 	int max_fd;
 	char buf[BUFSIZ];
 	ssize_t bytes;
 	int n;
+
 	while (master_fd != -1) {
 
 		FD_ZERO(read_fds);
@@ -247,9 +250,9 @@ static void shovel_tty(int master_fd, int in_fd) {
 			if ((bytes = read(in_fd, buf, BUFSIZ)) > 0) {
 				if (master_fd != -1 && write(master_fd, buf, bytes) == -1)
 					break;
-			} else if (n == -1 && errno == EINTR) {
+			} else if (n == -1 && errno == EINTR)
 				continue;
-			} else {
+			else {
 				in_fd = -1;
 				continue;
 			}
@@ -259,9 +262,9 @@ static void shovel_tty(int master_fd, int in_fd) {
 			if ((bytes = read(master_fd, buf, BUFSIZ)) > 0) {
 				if (write(STDOUT_FILENO, buf, bytes) == -1)
 					break;
-			} else if (n == -1 && errno == EINTR) {
+			} else if (n == -1 && errno == EINTR)
 				continue;
-			} else {
+			else {
 				close(master_fd);
 				master_fd = -1;
 				continue;
@@ -281,15 +284,13 @@ static void setup_pty_parent(int master_fd)
 	sigaction(SIGWINCH, &sa, NULL);
 
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) >= 0)
-		(void) ioctl(master_fd, TIOCSWINSZ, &ws);
+		(void)ioctl(master_fd, TIOCSWINSZ, &ws);
 
-	if (set_tty_raw(STDIN_FILENO, &stdin_termios) != -1) {
+	if (set_tty_raw(STDIN_FILENO, &stdin_termios) != -1)
 		atexit((void (*)(void))restore_stdin);
-	}
 
-	if (set_tty_raw(STDOUT_FILENO, &stdout_termios) != -1) {
+	if (set_tty_raw(STDOUT_FILENO, &stdout_termios) != -1)
 		atexit((void (*)(void))restore_stdout);
-	}
 }
 
 static int setup_pty_child(int master_fd)
@@ -298,6 +299,7 @@ static int setup_pty_child(int master_fd)
 	int slave_fd;
 
 	char* slave_name = ptsname(master_fd);
+
 	if (slave_name == NULL)
 		return -errno;
 
@@ -313,8 +315,8 @@ static int setup_pty_child(int master_fd)
 		return -errno;
 
 	if (dup2(slave_fd, STDIN_FILENO) != STDIN_FILENO ||
-			dup2(slave_fd, STDOUT_FILENO) != STDOUT_FILENO ||
-			dup2(slave_fd, STDERR_FILENO) != STDERR_FILENO)
+	    dup2(slave_fd, STDOUT_FILENO) != STDOUT_FILENO ||
+	    dup2(slave_fd, STDERR_FILENO) != STDERR_FILENO)
 		return -errno;
 
 	/*only close, if slave_fd is not std-fd*/
@@ -371,7 +373,7 @@ static void continue_as_child(bool open_pty)
 		setup_pty_parent(master_fd);
 	}
 
-	for (;;) {
+	for (;; ) {
 		if (open_pty)
 			shovel_tty(master_fd, STDIN_FILENO);
 		ret = waitpid(child, &status, WUNTRACED);
@@ -379,16 +381,14 @@ static void continue_as_child(bool open_pty)
 			/* The child suspended so suspend us as well */
 			kill(getpid(), SIGSTOP);
 			kill(child, SIGCONT);
-		} else {
+		} else
 			break;
-		}
 	}
 	/* Return the child's exit code if possible */
-	if (WIFEXITED(status)) {
+	if (WIFEXITED(status))
 		exit(WEXITSTATUS(status));
-	} else if (WIFSIGNALED(status)) {
+	else if (WIFSIGNALED(status))
 		kill(getpid(), WTERMSIG(status));
-	}
 	exit(EXIT_FAILURE);
 }
 
@@ -429,23 +429,23 @@ int main(int argc, char *argv[])
 		OPT_PRESERVE_CRED = CHAR_MAX + 1
 	};
 	static const struct option longopts[] = {
-		{ "help", no_argument, NULL, 'h' },
-		{ "pty", no_argument, NULL, 'P' },
-		{ "version", no_argument, NULL, 'V'},
-		{ "target", required_argument, NULL, 't' },
-		{ "mount", optional_argument, NULL, 'm' },
-		{ "uts", optional_argument, NULL, 'u' },
-		{ "ipc", optional_argument, NULL, 'i' },
-		{ "net", optional_argument, NULL, 'n' },
-		{ "pid", optional_argument, NULL, 'p' },
-		{ "user", optional_argument, NULL, 'U' },
-		{ "setuid", required_argument, NULL, 'S' },
-		{ "setgid", required_argument, NULL, 'G' },
-		{ "root", optional_argument, NULL, 'r' },
-		{ "wd", optional_argument, NULL, 'w' },
-		{ "no-fork", no_argument, NULL, 'F' },
-		{ "preserve-credentials", no_argument, NULL, OPT_PRESERVE_CRED },
-		{ NULL, 0, NULL, 0 }
+		{ "help",		  no_argument,	     NULL, 'h'		     },
+		{ "pty",		  no_argument,	     NULL, 'P'		     },
+		{ "version",		  no_argument,	     NULL, 'V'		     },
+		{ "target",		  required_argument, NULL, 't'		     },
+		{ "mount",		  optional_argument, NULL, 'm'		     },
+		{ "uts",		  optional_argument, NULL, 'u'		     },
+		{ "ipc",		  optional_argument, NULL, 'i'		     },
+		{ "net",		  optional_argument, NULL, 'n'		     },
+		{ "pid",		  optional_argument, NULL, 'p'		     },
+		{ "user",		  optional_argument, NULL, 'U'		     },
+		{ "setuid",		  required_argument, NULL, 'S'		     },
+		{ "setgid",		  required_argument, NULL, 'G'		     },
+		{ "root",		  optional_argument, NULL, 'r'		     },
+		{ "wd",			  optional_argument, NULL, 'w'		     },
+		{ "no-fork",		  no_argument,	     NULL, 'F'		     },
+		{ "preserve-credentials", no_argument,	     NULL, OPT_PRESERVE_CRED },
+		{ NULL,			  0,		     NULL, 0		     }
 	};
 
 	struct namespace_file *nsfile;
@@ -458,17 +458,17 @@ int main(int argc, char *argv[])
 	atexit(close_stdout);
 
 	while ((c =
-		getopt_long(argc, argv, "+hPVt:m::u::i::n::p::U::S:G:r::w::F",
-			    longopts, NULL)) != -1) {
+			getopt_long(argc, argv, "+hPVt:m::u::i::n::p::U::S:G:r::w::F",
+				    longopts, NULL)) != -1) {
 		switch (c) {
 		case 'h':
 			usage(EXIT_SUCCESS);
 		case 'V':
-			printf("nsenter-pty %d", PROGRAM_VERSION);
+			printf("nsenter-pty %s\n", PROGRAM_VERSION);
 			return EXIT_SUCCESS;
 		case 't':
 			namespace_target_pid =
-			    strtoul_or_err(optarg, "failed to parse pid");
+				strtoul_or_err(optarg, "failed to parse pid");
 			break;
 		case 'm':
 			if (optarg)
@@ -622,11 +622,11 @@ int main(int argc, char *argv[])
 		continue_as_child(open_pty);
 
 	if (force_uid || force_gid) {
-		if (force_gid && setgroups(0, NULL) != 0 && setgroups_nerrs)	/* drop supplementary groups */
+		if (force_gid && setgroups(0, NULL) != 0 && setgroups_nerrs)    /* drop supplementary groups */
 			err(EXIT_FAILURE, "setgroups failed");
-		if (force_gid && setgid(gid) < 0)		/* change GID */
+		if (force_gid && setgid(gid) < 0)                               /* change GID */
 			err(EXIT_FAILURE, "setgid failed");
-		if (force_uid && setuid(uid) < 0)		/* change UID */
+		if (force_uid && setuid(uid) < 0)                               /* change UID */
 			err(EXIT_FAILURE, "setuid failed");
 	}
 
