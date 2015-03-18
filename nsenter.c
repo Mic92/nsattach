@@ -44,8 +44,6 @@
 
 #include "nls.h"
 #include "c.h"
-#include "signal.h"
-#include "strutils.h"
 
 unsigned long strtoul_or_err(const char *str, const char *errmesg)
 {
@@ -63,19 +61,9 @@ unsigned long strtoul_or_err(const char *str, const char *errmesg)
 	return num;
 err:
 	if (errno)
-		err(STRTOXX_EXIT_CODE, "%s: '%s'", errmesg, str);
+		err(EXIT_FAILURE, "%s: '%s'", errmesg, str);
 
-	errx(STRTOXX_EXIT_CODE, "%s: '%s'", errmesg, str);
-}
-
-static inline __ul_alloc_size(1)
-void *xmalloc(const size_t size)
-{
-        void *ret = malloc(size);
-
-        if (!ret && size)
-                err(EXIT_FAILURE, "cannot allocate %zu bytes", size);
-        return ret;
+	errx(EXIT_FAILURE, "%s: '%s'", errmesg, str);
 }
 
 #define DEFAULT_SHELL "/bin/sh"
@@ -88,7 +76,9 @@ void exec_shell(void)
 		shell = DEFAULT_SHELL;
 
 	shell_basename = basename(shell);
-	arg0 = xmalloc(strlen(shell_basename) + 2);
+	arg0 = malloc(strlen(shell_basename) + 2);
+	if (!arg0)
+		err(EXIT_FAILURE, "failed to allocate memory");
 	arg0[0] = '-';
 	strcpy(arg0 + 1, shell_basename);
 
