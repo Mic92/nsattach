@@ -269,14 +269,14 @@ static inline size_t get_hostname_max(void)
  * Constant strings for usage() functions. For more info see
  * Documentation/howto-usage-function.txt and disk-utils/delpart.c
  */
-#define USAGE_HEADER     _("\nUsage:\n")
-#define USAGE_OPTIONS    _("\nOptions:\n")
+#define USAGE_HEADER     "\nUsage:\n"
+#define USAGE_OPTIONS    "\nOptions:\n"
 #define USAGE_SEPARATOR    "\n"
-#define USAGE_HELP       _(" -h, --help     display this help and exit\n")
-#define USAGE_VERSION    _(" -V, --version  output version information and exit\n")
-#define USAGE_MAN_TAIL(_man)   _("\nFor more details see %s.\n"), _man
+#define USAGE_HELP       " -h, --help     display this help and exit\n"
+#define USAGE_VERSION    " -V, --version  output version information and exit\n"
+#define USAGE_MAN_TAIL(_man)   "\nFor more details see %s.\n", _man
 
-#define UTIL_LINUX_VERSION _("%s from %s\n"), program_invocation_short_name, PACKAGE_STRING
+#define UTIL_LINUX_VERSION "%s from %s\n", program_invocation_short_name, PACKAGE_STRING
 
 /*
  * scanf modifiers for "strings allocation"

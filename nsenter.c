@@ -42,7 +42,6 @@
 #include <linux/sched.h>
 #include <stdio_ext.h>
 
-#include "nls.h"
 #include "c.h"
 
 unsigned long strtoul_or_err(const char *str, const char *errmesg)
@@ -83,7 +82,7 @@ void exec_shell(void)
 	strcpy(arg0 + 1, shell_basename);
 
 	execl(shell, arg0, NULL);
-	err(EXIT_FAILURE, _("failed to execute %s"), shell);
+	err(EXIT_FAILURE, "failed to execute %s", shell);
 }
 
 static struct namespace_file {
@@ -111,27 +110,27 @@ static void usage(int status)
 	FILE *out = status == EXIT_SUCCESS ? stdout : stderr;
 
 	fputs(USAGE_HEADER, out);
-	fprintf(out, _(" %s [options] <program> [<argument>...]\n"),
+	fprintf(out, " %s [options] <program> [<argument>...]\n",
 		program_invocation_short_name);
 
 	fputs(USAGE_SEPARATOR, out);
-	fputs(_("Run a program with namespaces of other processes.\n"), out);
+	fputs("Run a program with namespaces of other processes.\n", out);
 
 	fputs(USAGE_OPTIONS, out);
-	fputs(_(" -t, --target <pid>     target process to get namespaces from\n"), out);
-	fputs(_(" -m, --mount[=<file>]   enter mount namespace\n"), out);
-	fputs(_(" -u, --uts[=<file>]     enter UTS namespace (hostname etc)\n"), out);
-	fputs(_(" -i, --ipc[=<file>]     enter System V IPC namespace\n"), out);
-	fputs(_(" -n, --net[=<file>]     enter network namespace\n"), out);
-	fputs(_(" -p, --pid[=<file>]     enter pid namespace\n"), out);
-	fputs(_(" -U, --user[=<file>]    enter user namespace\n"), out);
-	fputs(_(" -S, --setuid <uid>     set uid in entered namespace\n"), out);
-	fputs(_(" -G, --setgid <gid>     set gid in entered namespace\n"), out);
-	fputs(_("     --preserve-credentials do not touch uids or gids\n"), out);
-	fputs(_(" -P, --pty              allocate a pseudo-TTY (this implies forking)\n"), out);
-	fputs(_(" -r, --root[=<dir>]     set the root directory\n"), out);
-	fputs(_(" -w, --wd[=<dir>]       set the working directory\n"), out);
-	fputs(_(" -F, --no-fork          do not fork before exec'ing <program>\n"), out);
+	fputs(" -t, --target <pid>     target process to get namespaces from\n", out);
+	fputs(" -m, --mount[=<file>]   enter mount namespace\n", out);
+	fputs(" -u, --uts[=<file>]     enter UTS namespace (hostname etc)\n", out);
+	fputs(" -i, --ipc[=<file>]     enter System V IPC namespace\n", out);
+	fputs(" -n, --net[=<file>]     enter network namespace\n", out);
+	fputs(" -p, --pid[=<file>]     enter pid namespace\n", out);
+	fputs(" -U, --user[=<file>]    enter user namespace\n", out);
+	fputs(" -S, --setuid <uid>     set uid in entered namespace\n", out);
+	fputs(" -G, --setgid <gid>     set gid in entered namespace\n", out);
+	fputs("     --preserve-credentials do not touch uids or gids\n", out);
+	fputs(" -P, --pty              allocate a pseudo-TTY (this implies forking)\n", out);
+	fputs(" -r, --root[=<dir>]     set the root directory\n", out);
+	fputs(" -w, --wd[=<dir>]       set the working directory\n", out);
+	fputs(" -F, --no-fork          do not fork before exec'ing <program>\n", out);
 
 	fputs(USAGE_SEPARATOR, out);
 	fputs(USAGE_HELP, out);
@@ -158,7 +157,7 @@ static void open_target_fd(int *fd, const char *type, const char *path)
 	}
 	if (!path)
 		errx(EXIT_FAILURE,
-		     _("neither filename nor target pid supplied for %s"),
+		     "neither filename nor target pid supplied for %s",
 		     type);
 
 	if (*fd >= 0)
@@ -166,7 +165,7 @@ static void open_target_fd(int *fd, const char *type, const char *path)
 
 	*fd = open(path, O_RDONLY);
 	if (*fd < 0)
-		err(EXIT_FAILURE, _("cannot open %s"), path);
+		err(EXIT_FAILURE, "cannot open %s", path);
 }
 
 static void open_namespace_fd(int nstype, const char *path)
@@ -196,14 +195,14 @@ static void restore_stdin(void)
 {
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &stdin_termios) == -1)
 		errx(EXIT_FAILURE,
-				_("failed to restore stdin terminal attributes"));
+				"failed to restore stdin terminal attributes");
 }
 
 static void restore_stdout(void)
 {
 	if (tcsetattr(STDOUT_FILENO, TCSANOW, &stdout_termios) == -1)
 		errx(EXIT_FAILURE,
-				_("failed to restore stdout terminal attributes"));
+				"failed to restore stdout terminal attributes");
 }
 
 
@@ -352,18 +351,18 @@ static void continue_as_child(bool open_pty)
 	if (open_pty) {
 		master_fd = new_pty();
 		if (master_fd < 0)
-			err(EXIT_FAILURE, _("open pseudo tty failed"));
+			err(EXIT_FAILURE, "open pseudo tty failed");
 	}
 
 	child = fork();
 
 	if (child < 0)
-		err(EXIT_FAILURE, _("fork failed"));
+		err(EXIT_FAILURE, "fork failed");
 
 	/* Only the child returns */
 	if (child == 0) {
 		if (open_pty && setup_pty_child(master_fd) < 0)
-			err(EXIT_FAILURE, _("failed to setup slave of pseudo tty"));
+			err(EXIT_FAILURE, "failed to setup slave of pseudo tty");
 		close(master_fd);
 		return;
 	}
@@ -415,9 +414,9 @@ close_stdout(void)
 {
 	if (close_stream(stdout) != 0 && !(errno == EPIPE)) {
 		if (errno)
-			warn(_("write error"));
+			warn("write error");
 		else
-			warnx(_("write error"));
+			warnx("write error");
 		_exit(EXIT_FAILURE);
 	}
 
@@ -457,9 +456,6 @@ int main(int argc, char *argv[])
 	uid_t uid = 0;
 	gid_t gid = 0;
 
-	setlocale(LC_ALL, "");
-	bindtextdomain(PACKAGE, LOCALEDIR);
-	textdomain(PACKAGE);
 	atexit(close_stdout);
 
 	while ((c =
@@ -473,7 +469,7 @@ int main(int argc, char *argv[])
 			return EXIT_SUCCESS;
 		case 't':
 			namespace_target_pid =
-			    strtoul_or_err(optarg, _("failed to parse pid"));
+			    strtoul_or_err(optarg, "failed to parse pid");
 			break;
 		case 'm':
 			if (optarg)
@@ -515,11 +511,11 @@ int main(int argc, char *argv[])
 				namespaces |= CLONE_NEWUSER;
 			break;
 		case 'S':
-			uid = strtoul_or_err(optarg, _("failed to parse uid"));
+			uid = strtoul_or_err(optarg, "failed to parse uid");
 			force_uid = true;
 			break;
 		case 'G':
-			gid = strtoul_or_err(optarg, _("failed to parse gid"));
+			gid = strtoul_or_err(optarg, "failed to parse gid");
 			force_gid = true;
 			break;
 		case 'F':
@@ -586,7 +582,7 @@ int main(int argc, char *argv[])
 			do_fork = 1;
 		if (setns(nsfile->fd, nsfile->nstype))
 			err(EXIT_FAILURE,
-			    _("reassociate to namespace '%s' failed"),
+			    "reassociate to namespace '%s' failed",
 			    nsfile->name);
 		close(nsfile->fd);
 		nsfile->fd = -1;
@@ -597,17 +593,17 @@ int main(int argc, char *argv[])
 		wd_fd = open(".", O_RDONLY);
 		if (wd_fd < 0)
 			err(EXIT_FAILURE,
-			    _("cannot open current working directory"));
+			    "cannot open current working directory");
 	}
 
 	/* Change the root directory */
 	if (root_fd >= 0) {
 		if (fchdir(root_fd) < 0)
 			err(EXIT_FAILURE,
-			    _("change directory by root file descriptor failed"));
+			    "change directory by root file descriptor failed");
 
 		if (chroot(".") < 0)
-			err(EXIT_FAILURE, _("chroot failed"));
+			err(EXIT_FAILURE, "chroot failed");
 
 		close(root_fd);
 		root_fd = -1;
@@ -617,7 +613,7 @@ int main(int argc, char *argv[])
 	if (wd_fd >= 0) {
 		if (fchdir(wd_fd) < 0)
 			err(EXIT_FAILURE,
-			    _("change directory by working directory file descriptor failed"));
+			    "change directory by working directory file descriptor failed");
 
 		close(wd_fd);
 		wd_fd = -1;
@@ -628,16 +624,16 @@ int main(int argc, char *argv[])
 
 	if (force_uid || force_gid) {
 		if (force_gid && setgroups(0, NULL) != 0 && setgroups_nerrs)	/* drop supplementary groups */
-			err(EXIT_FAILURE, _("setgroups failed"));
+			err(EXIT_FAILURE, "setgroups failed");
 		if (force_gid && setgid(gid) < 0)		/* change GID */
-			err(EXIT_FAILURE, _("setgid failed"));
+			err(EXIT_FAILURE, "setgid failed");
 		if (force_uid && setuid(uid) < 0)		/* change UID */
-			err(EXIT_FAILURE, _("setuid failed"));
+			err(EXIT_FAILURE, "setuid failed");
 	}
 
 	if (optind < argc) {
 		execvp(argv[optind], argv + optind);
-		err(EXIT_FAILURE, _("failed to execute %s"), argv[optind]);
+		err(EXIT_FAILURE, "failed to execute %s", argv[optind]);
 	}
 	exec_shell();
 }
