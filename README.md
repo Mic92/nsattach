@@ -1,4 +1,4 @@
-# Fork nsenter from util-linux with pseudo tty support
+# Fork of nsenter from util-linux with pseudo tty support
 
 ## Build
 
