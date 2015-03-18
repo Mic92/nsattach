@@ -3,13 +3,13 @@
 ## Build
 
 ```
-./autogen.sh && ./configure && make
+./autogen.sh && ./configure && make && make install
 ```
 
 ## Usage
 
 ```
-sudo ./nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
+nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
 [root@base /]# tty
 /dev/pts/0
 ```
@@ -17,7 +17,7 @@ sudo ./nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty
 ### without pty
 
 ```
-sudo ./nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid bash
+nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid bash
 [root@base /]# tty
 not a tty
 ```
