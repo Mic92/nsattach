@@ -41,8 +41,20 @@
 #include <grp.h>
 #include <linux/sched.h>
 #include <stdio_ext.h>
+#include <limits.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <err.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
-#include "c.h"
+#define DEFAULT_SHELL "/bin/sh"
+#define PROGRAM_VERSION "1"
 
 unsigned long strtoul_or_err(const char *str, const char *errmesg)
 {
@@ -64,8 +76,6 @@ err:
 
 	errx(EXIT_FAILURE, "%s: '%s'", errmesg, str);
 }
-
-#define DEFAULT_SHELL "/bin/sh"
 
 void exec_shell(void)
 {
@@ -109,14 +119,14 @@ static void usage(int status)
 {
 	FILE *out = status == EXIT_SUCCESS ? stdout : stderr;
 
-	fputs(USAGE_HEADER, out);
+	fputs("\nUsage:\n", out);
 	fprintf(out, " %s [options] <program> [<argument>...]\n",
 		program_invocation_short_name);
 
-	fputs(USAGE_SEPARATOR, out);
+	fputs("\n", out);
 	fputs("Run a program with namespaces of other processes.\n", out);
 
-	fputs(USAGE_OPTIONS, out);
+	fputs("\nOptions:\n", out);
 	fputs(" -t, --target <pid>     target process to get namespaces from\n", out);
 	fputs(" -m, --mount[=<file>]   enter mount namespace\n", out);
 	fputs(" -u, --uts[=<file>]     enter UTS namespace (hostname etc)\n", out);
@@ -132,10 +142,11 @@ static void usage(int status)
 	fputs(" -w, --wd[=<dir>]       set the working directory\n", out);
 	fputs(" -F, --no-fork          do not fork before exec'ing <program>\n", out);
 
-	fputs(USAGE_SEPARATOR, out);
-	fputs(USAGE_HELP, out);
-	fputs(USAGE_VERSION, out);
-	fprintf(out, USAGE_MAN_TAIL("nsenter(1)"));
+	fputs("\n", out);
+	fputs(" -h, --help     display this help and exit\n", out);
+
+	fputs(" -V, --version  output version information and exit\n", out);
+	fprintf(out, "\nFor more details see nsenter(1).\n");
 
 	exit(status);
 }
@@ -465,7 +476,7 @@ int main(int argc, char *argv[])
 		case 'h':
 			usage(EXIT_SUCCESS);
 		case 'V':
-			printf(UTIL_LINUX_VERSION);
+			printf("nsenter-pty %d", PROGRAM_VERSION);
 			return EXIT_SUCCESS;
 		case 't':
 			namespace_target_pid =

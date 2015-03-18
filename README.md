@@ -3,7 +3,7 @@
 ## Build
 
 ```
-gcc -std=c99 -I include nsenter.c -o nsenter
+gcc -std=c99 nsenter.c -o nsenter
 ```
 
 ## Usage
