@@ -6,6 +6,8 @@
 ./autogen.sh && ./configure && make && make install
 ```
 
+On archlinux you can install [nsenter-pty](https://aur.archlinux.org/packages/nsenter-pty/) from AUR
+
 ## Usage
 
 ```
