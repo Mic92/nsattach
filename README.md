@@ -1,5 +1,7 @@
 # nsattach - attach to linux namespaces
 
+[![Build Status](https://travis-ci.org/Mic92/nsattach.svg?branch=master)](https://travis-ci.org/Mic92/nsattach)
+
 Fork of nsenter from util-linux with pseudo tty support for interactive usage.
 
 ## Build
