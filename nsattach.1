@@ -1,8 +1,8 @@
-.TH NSENTER 1 "June 2013" "util-linux" "User Commands"
+.TH NSATTACH 1 "March 2015" "nsattach" "User Commands"
 .SH NAME
-nsenter \- run program with namespaces of other processes
+nsattach \-  attach to namespace container
 .SH SYNOPSIS
-.B nsenter
+.B nsattach
 [options]
 .RI [ program
 .RI [ arguments ]]
@@ -40,11 +40,11 @@ flag)
 .TP
 .B PID namespace
 Children will have a set of PID to process mappings separate from the
-.B nsenter
+.B nsattach
 process
 .RB ( CLONE_\:NEWPID
 flag).
-.B nsenter
+.B nsattach
 will fork by default if changing the PID namespace, so that the new program
 and its children share the same PID namespace and are visible to each other.
 If \fB\-\-no\-fork\fP is used, the new program will be exec'ed without forking.
@@ -128,12 +128,12 @@ file.  See also the \fB\-\-setuid\fR and \fB\-\-setgid\fR options.
 \fB\-G\fR, \fB\-\-setgid\fR \fIgid\fR
 Set the group ID which will be used in the entered namespace and drop
 supplementary groups.
-.BR nsenter (1)
+.BR nsattach (1)
 always sets GID for user namespaces, the default is 0.
 .TP
 \fB\-S\fR, \fB\-\-setuid\fR \fIuid\fR
 Set the user ID which will be used in the entered namespace.
-.BR nsenter (1)
+.BR nsattach (1)
 always sets UID for user namespaces, the default is 0.
 .TP
 \fB\-\-preserve\-credentials\fR
@@ -143,7 +143,7 @@ drops supplementary groups and sets GID and UID to 0.
 \fB\-P\fR, \fB\-\-pty\fR\fR
 Allocate a pseudo-tty and attach the standart input/output of the command.  This
 option can be used for interactive programs, which requires access to its tty
-device, if mount namespaces are in use. If this option is set, nsenter will always
+device, if mount namespaces are in use. If this option is set, nsattach will always
 fork, before execu'ing the command.
 .TP
 \fB\-r\fR, \fB\-\-root\fR[=\fIdirectory\fR]
@@ -158,7 +158,7 @@ specified, set the working directory to the specified directory.
 .TP
 \fB\-F\fR, \fB\-\-no\-fork\fR
 Do not fork before exec'ing the specified program.  By default, when entering a
-PID namespace, \fBnsenter\fP calls \fBfork\fP before calling \fBexec\fP so that
+PID namespace, \fBnsattach\fP calls \fBfork\fP before calling \fBexec\fP so that
 any children will also be in the newly entered PID namespace.
 .TP
 \fB\-V\fR, \fB\-\-version\fR
@@ -172,9 +172,7 @@ Display help text and exit.
 .SH AUTHOR
 .MT ebiederm@xmission.com
 Eric Biederman
+.MT joerg@higgsboson.tk
+Jörg Thalheim
 .ME
-.SH AVAILABILITY
-The nsenter command is part of the util-linux package and is available from
-.UR ftp://\:ftp.kernel.org\:/pub\:/linux\:/utils\:/util-linux/
-Linux Kernel Archive
 .UE .

@@ -1,4 +1,6 @@
-# Fork of nsenter with pseudo tty support
+# nsattach - attach to linux namespaces
+
+Fork of nsenter from util-linux with pseudo tty support for interactive usage.
 
 ## Build
 
@@ -6,12 +8,17 @@
 ./autogen.sh && ./configure && make && make install
 ```
 
-On archlinux you can install [nsenter-pty](https://aur.archlinux.org/packages/nsenter-pty/) from AUR
+If you on a rescue mission and need this features quick, use the following
+command to get a small static binary:
+
+```
+curl https://raw.githubusercontent.com/Mic92/nsattach/master/nsattach.c | gcc -O2 -s -static -o /tmp/nsattach -xc -
+```
 
 ## Usage
 
 ```
-nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
+nsattach --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
 [root@base /]# tty
 /dev/pts/0
 ```
@@ -19,7 +26,7 @@ nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid --pty bash
 ### without pty
 
 ```
-nsenter-pty --target <NAMESPACE_IP> --mount --uts --ipc --net --pid bash
+nsattach --target <NAMESPACE_IP> --mount --uts --ipc --net --pid bash
 [root@base /]# tty
 not a tty
 ```

@@ -1,15 +1,15 @@
-AC_INIT([Minimalistic autotools boiler plate project for C++ applications/libraries],
-        [0.1],
-        [evilissimo@gmail.com],
-        [auto-boilerplate],
-        [http://github.com/vinzenz/auto-boilerplate])
+AC_INIT([attach to linux namespaces],
+        [1],
+        [joerg@higgsboson.tk],
+        [nsattach],
+        [http://github.com/Mic92/nsattach])
 AC_PREREQ([2.59])
 
 AM_INIT_AUTOMAKE([1.10 -Wall no-define subdir-objects])
 
 AC_PROG_CXX
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([nsenter-pty.c])
+AC_CONFIG_SRCDIR([nsattach.c])
 LT_INIT
 
 AC_CONFIG_FILES([

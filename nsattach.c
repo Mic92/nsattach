@@ -1,5 +1,5 @@
 /*
- * nsenter(1) - command-line interface for setns(2)
+ * nattach(1) - attach to namespace container
  *
  * Copyright (C) 2012-2013 Eric Biederman <ebiederm@xmission.com>
  * Copyright (C) 2015 Jörg Thalheim <joerg@higgsboson.tk>
@@ -42,7 +42,7 @@
 #include <unistd.h>
 
 #define DEFAULT_SHELL "/bin/sh"
-#define PROGRAM_VERSION "0.0.1"
+#define PROGRAM_VERSION "1"
 
 unsigned long strtoul_or_err(const char *str, const char *errmesg)
 {
@@ -135,7 +135,7 @@ static void usage(int status)
 	fputs(" -h, --help     display this help and exit\n", out);
 
 	fputs(" -V, --version  output version information and exit\n", out);
-	fprintf(out, "\nFor more details see nsenter(1).\n");
+	fprintf(out, "\nFor more details see nsattach(1).\n");
 
 	exit(status);
 }
@@ -464,7 +464,7 @@ int main(int argc, char *argv[])
 		case 'h':
 			usage(EXIT_SUCCESS);
 		case 'V':
-			printf("nsenter-pty %s\n", PROGRAM_VERSION);
+			printf("nsattach %s\n", PROGRAM_VERSION);
 			return EXIT_SUCCESS;
 		case 't':
 			namespace_target_pid =
